@@ -319,7 +319,7 @@ histogram.aggregate.all <- function(H,table, n=-1){
     ## we can assume each follow Multinomial(n=1, p=(p1,p2,...pk))
     ## what statisticians call Categorical
     ## then the posterior of p is
-    ## Dirichlet( p=(1/k+sum(p1's))/(N+1) and so on)
+    ## Dirichlet( vector of (1/k+sum(pi's)  and the means would be (1/K+psum)/(nreporting+1)and so on)
     base1 <- "a as (
 select
 id, buildid,branch,
