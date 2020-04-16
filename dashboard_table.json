@@ -1,0 +1,36 @@
+[
+  {
+    "name": "date_computed",
+    "type": "DATE"
+  },
+    {
+    "name": "buildid",
+    "type": "STRING"
+  },
+  {
+    "name": "what",
+    "type": "STRING"
+  },
+  {
+      "name": "nreporting",
+    "type": "integer"
+  },
+  {
+    "name": "low",
+    "type": "FLOAT64"
+  },
+  {
+    "name": "est",
+    "type": "FLOAT64"
+  },
+  {
+    "name": "high",
+    "type": "FLOAT64"
+  },
+  {
+    "name": "label",
+    "type": "STRING"
+  }
+    
+    
+]

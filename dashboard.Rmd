@@ -1,0 +1,425 @@
+---
+title: "DS-283: Webrender Nightly Dashboard"
+author: "Managed by Data Science,`r sprintf(' rendered at %s PST',Sys.time())`"
+output:
+  html_document:
+    toc: false
+    toc_depth: 5
+---
+
+
+
+<style>
+@import url("https://fonts.googleapis.com/css?family=Nunito|Quattrocento+Sans|Roboto+Mono:300&display=swap");
+body {
+    line-height: 1.4em;
+    font-family: 'Quattrocento Sans', sans-serif;
+    background-color: transparent;
+    }
+    
+
+.r {
+    background-color: white;
+    border: 0;
+        }
+        
+h4 { 
+    background-color: #EEF1E6; 
+}
+
+.author {
+    background-color: transparent;
+}
+
+pre code, pre, code {
+  white-space: pre !important;
+  overflow-x: scroll !important;
+  word-break: keep-all !important;
+  word-wrap: initial !important;
+}
+
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Nunito', sans-serif;
+}
+
+table {
+font-family: 'Roboto Mono', monospace;
+font-size: 85%;
+}
+
+pre,code {
+    border:0;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 80%;
+}
+
+ul.navtabs !{
+    border:0;
+}
+
+p.caption {
+    font-weight: bold;
+}
+
+p.caption ol,li {
+    font-weight: bold;
+}
+
+
+.figure {
+    text-align: center;
+    width: 80vw;
+    position: relative;
+    margin-left: calc((100% - 80vw)/2);
+}
+
+
+</style>
+
+
+
+```{r echo=FALSE,warning=FALSE, results='hide',message=FALSE,message=FALSE}
+library(knitr)
+knitr::opts_chunk$set(  cache=FALSE,echo=FALSE,warning=FALSE,message=FALSE,eval=FALSE,fig.width=13,fig.height=4)
+source("query.R")
+#g <- bq()
+
+```
+
+
+This is dashboard comparing Webrender vs Non Webrender via a Normandy
+experiment. The population targeted is Windows-10 Nightly platforms with Intel
+graphics cards. For more details read the [JIRA ticket](https://jira.mozilla.com/browse/DS-283) and the [Experimenter Page](https://experimenter.services.mozilla.com/experiments/webrender-continued-v2-nightly-only/).
+
+_Use your mouse to hover over areas on the graph for more information on the `buildid`. You can also use the
+scroll on the mouse pad to zoom into the figure. Double click the figure to reset._
+
+Information for builds till `r g$q("select max(buildid) as V from {ds_283_tablename}")$V`.
+
+
+```{r eval=TRUE}
+
+
+W <- 1000; H <- 200;
+```
+
+
+##  {.tabset}
+
+
+
+
+### Performance
+
+####  CONTENT_FRAME_TIME_VSYNC
+
+```{r eval=TRUE,fig.cap='Fig1. Probabilty CONTENT_FRAME_TIME_VSYNC >= 200'}
+
+content_frame_time_vsync.plot  <- create.figure(LL="content_frame_time_vsync_200",title="",
+                                                yaxislab='Proportion',width=W,height=H,
+                                                bqtable=ds_283_tablename, g=g)
+vw(content_frame_time_vsync.plot)
+
+```
+
+
+&nbsp;
+&nbsp;
+&nbsp;
+
+#### FX_TAB_SWITCH_COMPOSITE_E10S_MS
+
+```{r eval=TRUE,fig.cap='Fig2. Average FX_TAB_SWITCH_COMPOSITE_E10S_MS'}
+
+tab_switch_ms.plot  <- create.figure(LL="tab_switch_ms",title="",
+                                                yaxislab='ms',width=W,height=H,
+                                                bqtable=ds_283_tablename, g=g)
+vw(tab_switch_ms.plot)
+
+```
+
+
+&nbsp;
+
+
+#### FX_PAGE_LOAD_MS2
+```{r eval=TRUE,fig.cap='Fig3. Average FX_PAGE_LOAD_MS2'}
+
+page_load_ms.plot  <- create.figure(LL="page_load_ms",title="",
+                                                yaxislab='ms',width=W,height=H,
+                                                bqtable=ds_283_tablename, g=g)
+vw(page_load_ms.plot)
+
+```
+
+&nbsp;
+
+
+
+#### CONTENT_FULL_PAINT_TIME
+
+```{r eval=TRUE,fig.cap='Fig4. (a) Average CONTENT_FULL_PAINT_TIME and (b) Probability CONTENT_FULL_PAINT_TIME>=16ms(b)'}
+
+content_full_paint_time.plot  <- create.figure(LL="content_full_paint_time",title="(a) Average CONTENT_FULL_PAINT_TIME",
+                                              yaxislab='ms',width=W/1.85,height=H,
+                                              bqtable=ds_283_tablename, g=g,LA=90)
+
+content_full_paint_time_16.plot  <- create.figure(LL="content_full_paint_time_16",title="(b) Prob(CONTENT_FULL_PAINT_TIME>=16)",
+                                              yaxislab='',width=W/1.85,height=H,
+                                              bqtable=ds_283_tablename, g=g,LA=90)
+
+vw(list(
+    config = list( legend = list(direction='horizontal',orient='top',title=NULL)),
+    hconcat = list(
+          content_full_paint_time.plot,
+          content_full_paint_time_16.plot
+      )),TRUE)
+
+```
+
+
+&nbsp;
+
+#### CONTENT_PAINT_TIME
+
+```{r eval=TRUE,fig.cap='Fig5. (a) Average CONTENT_PAINT_TIME, (b) Probability CONTENT_PAINT_TIME>=16ms, and (c) 99 Percentile CONTENT_PAINT_TIME'}
+
+content_paint_time.plot  <- create.figure(LL="content_paint_time",title="(a) Avg. CONTENT_PAINT_TIME",
+                                              yaxislab='ms',width=W/1.85,height=H,
+                                              bqtable=ds_283_tablename, g=g,LA=90)
+
+
+content_paint_time_16.plot  <- create.figure(LL="content_paint_time_16",title="(b) Prob(CONTENT_PAINT_TIME>=16)",
+                                              yaxislab='',width=W/1.85,height=H,
+                                              bqtable=ds_283_tablename, g=g,LA=90)
+content_paint_time_99p.plot  <- create.figure(LL="content_paint_time_99",title="(c) 99 Percentile CONTENT_PAINT_TIME",
+                                              yaxislab='',width=W/1.85,height=H,
+                                              bqtable=ds_283_tablename, g=g,LA=90)
+
+vw(list(
+    config = list( legend = list(direction='horizontal',orient='top',title=NULL)),
+    vconcat=list(
+            list(
+                hconcat = list(
+                    content_paint_time.plot,
+                    content_paint_time_16.plot
+                )),
+            content_paint_time_99p.plot
+        )
+        ) ,TRUE)
+```
+
+&nbsp;
+
+#### COMPOSITE_TIME
+
+```{r eval=TRUE,fig.cap='Fig6. (a) Average COMPOSITE_TIME and (b) Probability COMPOSITE_TIME>=16ms'}
+
+composite_time.plot  <- create.figure(LL="composite_time",title="(a) Average COMPOSITE_TIME",
+                                              yaxislab='ms',width=W/1.85,height=H,
+                                              bqtable=ds_283_tablename, g=g,LA=90)
+
+composite_time_16.plot  <- create.figure(LL="composite_time_16",title="(b) Prob(COMPOSITE_TIME>=16)",
+                                              yaxislab='',width=W/1.85,height=H,
+                                              bqtable=ds_283_tablename, g=g,LA=90)
+
+vw(list(
+    config = list( legend = list(direction='horizontal',orient='top',title=NULL)),
+    hconcat = list(
+             composite_time.plot,
+             composite_time_16.plot
+      )),TRUE)
+
+```
+
+&nbsp;
+
+#### CONTENT_FRAME_TIME
+
+```{r eval=TRUE,fig.cap='Fig7. Probability CONTENT_FRAME_TIME>=192% vsync'}
+
+
+content_frame_time_192.plot  <- create.figure(LL="content_frame_time_192",title="",
+                                              yaxislab='',width=W,height=H,
+                                              bqtable=ds_283_tablename, g=g)
+
+vw(content_frame_time_192.plot,TRUE)
+
+```
+
+&nbsp;
+
+
+#### Severe Checkerboarding
+
+```{r eval=TRUE,fig.cap='Fig8. Severe Checkerboarding Events/1000 HR'}
+
+checker <- create.figure(LL="severe_checkerboard_perkhr",title="",
+                    yaxislab='Estimate(Per 1000 Hours)',width=W,height=H,
+                    bqtable=ds_283_tablename, g=g)
+vw(checker)
+```
+
+
+
+### Stability
+
+
+
+#### Crash Rate/Likelihood : ALL And Device Resets
+```{r eval=TRUE,fig.cap='Fig9. (a) Crash Rate (ALL) Per Profile Per 1000 Hrs (b) Proportion Profiles Crashing (ALL)'}
+
+
+mc <- create.figure(LL="ncrash_all_perkhr",title="(a) Crash Rate (ALL) Per Profile Per 1000 Hrs",
+                    yaxislab='Estimate',width=W/1.85,height=H,
+                    bqtable=ds_283_tablename, g=g,LA=90)
+mci <- create.figure(LL="ncrash_all_inci",title="(b) Proportion Profiles Crashing (ALL)",
+                    yaxislab='Proportion',width=W/1.85,height=H,
+                    bqtable=ds_283_tablename, g=g,LA=90)
+vw(list(
+    config = list( legend = list(direction='horizontal',orient='top',title=NULL)),
+    hconcat = list(
+             mc,mci
+         )
+        ),TRUE)
+
+```
+
+
+```{r eval=TRUE,fig.cap='Fig10. (a) Device Reset/Profile/1000 Hrs (b) Proportion of Profiles with Device Resets'}
+
+dr <- create.figure(LL="crash_device_resets_perkhr",title="(a) Device Reset Rate  Per Profile Per 1000 Hrs",
+                    yaxislab='Estimate',width=W/1.85,height=H,
+                    bqtable=ds_283_tablename, g=g,LA=90)
+
+dri <- create.figure(LL="device_reset_inci",title="(b) Proportion Profiles With Device Resets",
+                    yaxislab='Proportion',width=W/1.85,height=H,
+                    bqtable=ds_283_tablename, g=g,LA=90)
+vw(list(
+    config = list( legend = list(direction='horizontal',orient='top',title=NULL)),
+    hconcat = list(
+             dr,dri
+      )),TRUE)
+```
+
+#### Crash Rates: Detail (OOM,GPU,Content, Main)
+
+```{r eval=TRUE,fig.cap='Fig11. (a) Content, (b) Main, (c) GPU, and (d) OOM Crash Rates(/Profile/1000 Hrs)'}
+
+ccr <- create.figure(LL="ncrash_content_perkhr",title="(a) Content Crash Rate/Profile/1000 Hrs",
+                    yaxislab='Estimate',width=W/1.85,height=H,
+                    bqtable=ds_283_tablename, g=g,LA=90)
+
+cmr <- create.figure(LL="ncrash_main_perkhr",title="(b) Main Crash Rate/Profile/1000 Hrs",
+                    yaxislab='Estimate',width=W/1.85,height=H,
+                    bqtable=ds_283_tablename, g=g,LA=90)
+
+cgr <- create.figure(LL="ncrash_gpu_perkhr",title="(c) GPU Crash Rate/Profile/1000 Hrs",
+                    yaxislab='Estimate',width=W/1.85,height=H,
+                    bqtable=ds_283_tablename, g=g,LA=90)
+
+ cor <- create.figure(LL="ncrash_oom_perkhr",title="(d) OOM Crash Rate/Profile/1000 Hrs",
+                    yaxislab='Estimate',width=W/1.85,height=H,
+                    bqtable=ds_283_tablename, g=g,LA=90)
+
+vw(list(
+    config = list( legend = list(direction='horizontal',orient='top',title=NULL)),
+    vconcat=list(
+            list(hconcat = list( ccr,cmr)),
+            list(hconcat = list( cgr,cor))
+        )
+        ) ,TRUE)
+
+```
+
+
+### Usage
+
+
+```{r eval=TRUE,fig.cap='Fig12. Active Hours/Profile While on Build'}
+
+ah <- create.figure(LL="active_hours",title="",
+                    yaxislab='Hours',width=W,height=H,
+                    bqtable=ds_283_tablename, g=g)
+vw(ah)
+```
+
+
+```{r eval=TRUE,fig.cap='Fig13. Total Hours/Profile While on Build'}
+th <- create.figure(LL="total_hours",title="",
+                    yaxislab='Hours',width=W,height=H,
+                    bqtable=ds_283_tablename, g=g)
+vw(th)
+
+```{r eval=TRUE,fig.cap='Fig14. URIs/Profile/Active While on Build'}
+uh <- create.figure(LL="uri_per_profile_activehour",title="",
+                    yaxislab='Estimate',width=W,height=H,
+                    bqtable=ds_283_tablename, g=g)
+vw(uh)
+
+
+```
+
+
+### Enrollments
+
+
+```{r eval=TRUE,fig.cap='Fig 15. Client Enrollments Across Builds'}
+
+enrolls <- g$q("select * from {ds_283_tablename} where label='enrollement_status' order by buildid, what",-1)
+enrolls <- enrolls[, list(Branch=what, buildid=buildid, Enrolled = nreporting)]
+enrolls <- enrolls[, buildid := parse_date(buildid)]
+enrolls <- enrolls[Branch=='enabled',  buildid2 := format_iso_8601(buildid-as.difftime(0,units='mins'))]
+enrolls <- enrolls[Branch=='disabled', buildid2 := format_iso_8601(buildid+as.difftime(0,units='mins'))]
+
+enroll.plot <- list(
+        `$schema` = vega_schema(),
+    data = list(values = enrolls),
+        title = list(text="", anchor='start',fontWeight = 'normal'),
+        width = W,
+        height = H,
+        autosize = list(type='fit',contains='content'),
+        layer = list(            
+            list(
+                selection = list(
+                    grid = list(type= "interval", bind="scales")
+                ),
+                mark = list(type="line",point='true'), #'transparent'), #,filled=TRUE),
+                encoding = list(
+#                    size = list(value=65),
+                    x = list(field="buildid2",type='temporal',timeUnit="yearmonthdatehoursminutes",
+                             axis=list(title="BuildIDs on this Date",titleFontWeight='light',
+                                       tickExtra=FALSE,
+                                       #tickCount=length(unique(xx$buildid)),
+                                       grid=FALSE,labelOverlap='parity', format='%Y%m%d', labelAngle=360),
+                             scale= list(type= "utc")
+                             ),
+                    y = list(field="Enrolled",
+                             type="quantitative",axis=list(title="Enrolled Clients",grid=TRUE,
+                                                           titleFontSize=11)),
+                    color = list(field = "Branch", type = "nominal",scale=list(scheme="set1"),
+                                 legend = list(direction='horizontal',orient='top',title=NULL)
+                                 ),
+                    tooltip=list(list(field = "buildid",type="nominal"),
+                                 list(field = 'Branch', type='ordinal'),
+                                 list(field = 'Enrolled', type='quantitative')
+                                 )
+                ))
+        )
+)
+
+vw(enroll.plot)
+```
+
+
+
+### About
+
+The sample size is not enough to detect small changes but choosing more would
+use up all the appropriate population. This experiment will continue to enroll for
+about a year.
+
+
+Each `buildid` has `r SEVEN` days of data. Though most of the profiles update to
+a build within 3-4 days of release we capture almost all of them within  7
+days. 
