@@ -420,6 +420,67 @@ use up all the appropriate population. This experiment will continue to enroll f
 about a year.
 
 
-Each `buildid` has `r SEVEN` days of data. Though most of the profiles update to
-a build within 3-4 days of release we capture almost all of them within  7
-days. 
+#### ETL
+
+The etl step runs everyday. The table `r ds_283_tablename` is read and those buildids that have
+less than `r SEVEN`  days of data are updated. We only use three first `r SEVEN`
+days since a  build
+is released to estimate results for that build. For these builids we retrieve
+performance, stability and usage data from `telemetry.main` (see code [here](https://github.com/mozilla/webrender_intel_win10_nightly/blob/master/driver.Rmd#L136)).
+
+The etl also does the summarization. For usage information we compute means and
+bootstrap intervals across the observation period (at most D says) for both
+branches. Relative differences with respect to “disabled” are also computed
+
+We do the same for crash information.
+
+All metrics are per client and each client has the same weight.
+
+Code for the above can be viewed
+[here](https://github.com/mozilla/webrender_intel_win10_nightly/blob/master/driver.Rmd#L156)
+and [here](https://github.com/mozilla/webrender_intel_win10_nightly/blob/master/driver.Rmd#L229).
+
+For histograms, we follow the GLAM approach. That is we aggregate a clients
+responses for a given histogram to one response (add all values for same bucket
+for that client). This is then normalized to a density (convert sums to
+proportions that sum to 1). These densities are averaged across clients. Under a
+certain set of assumptions we can use these calculations to arrive at means and
+error bars (see appendix).  The average density across clients is the
+representative distribution of a typical histogram value for a typical client
+. Note, this is the not the distribution of the average histogram response for a
+client.
+
+(There is one exception, checkerboard severity, where reduce the histogram to an average for a client)
+
+Using this model for histograms, we compute the relevant statistics, relative
+differences and their error bars. These are then uploaded to table `r ds_283_tablename`..
+
+#### Dashboard
+
+The dashboards is arranged in 3 tabs corresponding to performance, stability and
+usage. Two lines one for each branch and each point corresponds to a build is
+
+Hover over to see builid, value and error bar. The hover over also reveals the
+relative difference and if this is followed by check mark then one can conclude
+that there is sufficient evidence to conclude that branches are different.
+
+You can zoom in with the mouse and doubl clock to reset.
+
+The code for this is
+[here](https://github.com/mozilla/webrender_intel_win10_nightly/blob/master/dashboard.Rmd).
+
+
+#### Appendix
+
+The file
+[query.R](https://github.com/mozilla/webrender_intel_win10_nightly/blob/master/query.R)
+contains all the functions.
+
+If we have one observation, $X$ that can be one bucket out of $K$, we can model
+this as a [Categorical Distribution](https://en.wikipedia.org/wiki/Categorical_distribution). 
+We place a Dirichlet($1/K$) prior on the parameters and assuming every client
+follows the same distribution, then the posterior is
+Dirichlet($\sum p_1+1/K$\,$\sum p_2+1/K$,...,$\sum p_K+1/K$). Using this we can
+get error bounds on estimates. 
+
+

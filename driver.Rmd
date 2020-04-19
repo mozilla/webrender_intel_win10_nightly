@@ -306,6 +306,7 @@ content_frame_time.gt.192 <- histogram.summary.cuts(content_frame_time.h,CUT=192
 
 
 ```{r eval=if(is.debug) FALSE else TRUE}
+
 allstuff <- rbindlist(
     list(
         enrollment.status,
@@ -336,16 +337,13 @@ allstuff <- rbindlist(
     )
 )
 allstuff <- cbind(date_computed = Sys.Date(),allstuff)
-
+allstuff[, .N, by=buildid]
 
 ## Delete from the original table _anything_ that has buildids listed here
 ## which is any buildid larger than the minimum buildid we have
 min_buildid <- min(allstuff$buildid)
 g$q("delete from {ds_283_tablename} where buildid>='{min_buildid}'")
-
 ##system(glue("bq query --format=prettyjson --nouse_legacy_sql 'delete from {ds_283_tablename} where buildid>=\'{min_buildid}\'' "))
-
-
 atemp <- tempfile()
 fwrite(allstuff, file=atemp,row.names=FALSE,quote=TRUE,na=0)
 l <- glue("bq load --noreplace    --source_format=CSV --skip_leading_rows=1 --null_marker=NA",
