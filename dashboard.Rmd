@@ -476,11 +476,5 @@ The file
 [query.R](https://github.com/mozilla/webrender_intel_win10_nightly/blob/master/query.R)
 contains all the functions.
 
-If we have one observation, $X$ that can be one bucket out of $K$, we can model
-this as a [Categorical Distribution](https://en.wikipedia.org/wiki/Categorical_distribution). 
-We place a Dirichlet($1/K$) prior on the parameters and assuming every client
-follows the same distribution, then the posterior is
-Dirichlet($\sum p_1+1/K$\,$\sum p_2+1/K$,...,$\sum p_K+1/K$). Using this we can
-get error bounds on estimates. 
-
-
+For the approach taken to compute error bars, please see [this Google Doc](https://docs.google.com/document/d/1ipy1oFIKDvHr3R6Ku0goRjS11R1ZH1z2gygOGkSdqUg/edit)
+describing how it is done for GLAM.

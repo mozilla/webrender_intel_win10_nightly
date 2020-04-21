@@ -77,7 +77,7 @@ g <- bq()
 args <- params$args
 is.debug <- if(!is.null(args$debug)) args$debug else FALSE
 ##args <- list(max.build.id='2020-04-01')
-is.debug <- TRUE
+## is.debug <- TRUE
 ```
 
 
@@ -305,7 +305,7 @@ content_frame_time.gt.192 <- histogram.summary.cuts(content_frame_time.h,CUT=192
 ```
 
 
-```{r eval=if(is.debug) FALSE else TRUE}
+```{r eval=TRUE}
 
 allstuff <- rbindlist(
     list(
@@ -338,9 +338,14 @@ allstuff <- rbindlist(
 )
 allstuff <- cbind(date_computed = Sys.Date(),allstuff)
 allstuff[, .N, by=buildid]
+```
+
+
+```{r eval=if(is.debug) FALSE else TRUE}
 
 ## Delete from the original table _anything_ that has buildids listed here
 ## which is any buildid larger than the minimum buildid we have
+
 min_buildid <- min(allstuff$buildid)
 g$q("delete from {ds_283_tablename} where buildid>='{min_buildid}'")
 ##system(glue("bq query --format=prettyjson --nouse_legacy_sql 'delete from {ds_283_tablename} where buildid>=\'{min_buildid}\'' "))
