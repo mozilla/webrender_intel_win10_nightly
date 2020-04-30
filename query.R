@@ -157,23 +157,24 @@ myclients AS (
         AND substr(metadata.uri.app_version,1,2)>='76' and substr(metadata.uri.app_version,1,2)<='80'
         AND substr(application.build_id,1,8)>='20200401'
 )
-,client_rank AS ( 
-    SELECT  cid, 
-        dense_rank() OVER ( ORDER BY cid) AS id 
-    FROM myclients 
-)
-,joined2  AS ( 
-    SELECT 
-        myclients.*, 
-        client_rank.id AS id 
-    FROM myclients 
-    JOIN client_rank 
-    ON 
-        myclients.cid  = client_rank.cid )
+,client_rank AS (
+    SELECT  cid,
+            dense_rank() OVER ( ORDER BY cid) AS id
+    FROM myclients
+),
+client_rank2 AS (    SELECT cid, max(id) as id from client_rank group by 1)
+,joined2  AS (
+    SELECT
+         a.*,
+        client_rank2.id AS id
+    FROM myclients a
+    JOIN client_rank2
+    ON
+        a.cid  = client_rank2.cid )
 ,final as (
 SELECT 
     * 
---    EXCEPT(cid) 
+    EXCEPT(cid) 
 FROM joined2)
 
 -- select branch,count(*),count(distinct(cid)) from myclients group by 1
