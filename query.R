@@ -8,6 +8,7 @@ library(Hmisc)
 library(logging)
 library(parsedate)
 library(vegawidget)
+library(rmarkdown)
 
 ds_283_tablename <- "`moz-fx-data-shared-prod`.analysis.sguha_ds_283"
 ds_283_tablename_tmp  <- "`moz-fx-data-shared-prod`.analysis.sguha_ds_283_tmp"
