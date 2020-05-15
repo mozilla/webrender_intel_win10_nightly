@@ -76,7 +76,7 @@ g <- bq()
 ##      )
 args <- params$args
 is.debug <- if(!is.null(args$debug)) args$debug else FALSE
-##args <- list(max.build.id='2020-04-01')
+#args <- list(max.build.id='2020-04-01')
 ## is.debug <- TRUE
 ```
 

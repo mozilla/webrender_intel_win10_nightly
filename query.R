@@ -2,7 +2,6 @@
 library(data.table)
 library(bigrquery)
 library(DBI)
-library(data.table)
 library(glue)
 library(boot)
 library(Hmisc)
@@ -174,7 +173,7 @@ client_rank2 AS (    SELECT cid, max(id) as id from client_rank group by 1)
 ,final as (
 SELECT 
     * 
-    EXCEPT(cid) 
+    --EXCEPT(cid) 
 FROM joined2)
 
 -- select branch,count(*),count(distinct(cid)) from myclients group by 1
