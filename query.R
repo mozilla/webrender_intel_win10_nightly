@@ -27,7 +27,7 @@ if(!exists("query.R")){
     query.R <- TRUE
 }
 
-bq <- function(project = 'moz-fx-data-derived-datasets'
+bq <- function(project = 'moz-fx-data-shared-prod'
               ,dataset = 'telemetry'
               ,use_email = NULL
                ){
