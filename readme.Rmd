@@ -5,6 +5,7 @@ sudo docker build -t ds_283_prod .
 ```
 
 We are good to go. Now for testing, I mount my `gargle` cached authentifications(and other google auths too)  into the container and run it like so
+(you might not  need sudo)
 
 ```
 
@@ -12,6 +13,11 @@ sudo docker run -it  -v ~/.R:/root/.R  -v ~/.config:/root/.config ds_283_prod
 
 ```
 
+if you have a service account, then
+
+```
+sudo docker run -it -v PATH_TO_SERVICE_CREDENITIALS.json:/app/.credentials -e GOOGLE_APPLICATION_CREDENTIALS=/app/.credentials ds_283_prod
+```
 
 
 And that ought be it! The dashboard is copied to `gs://moz-fx-data-prod-analysis/sguha/ds_283/`.

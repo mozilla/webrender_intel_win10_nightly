@@ -79,10 +79,11 @@ p.caption ol,li {
 
 
 ```{r echo=FALSE,warning=FALSE, results='hide',message=FALSE,message=FALSE}
+
 library(knitr)
 knitr::opts_chunk$set(  cache=FALSE,echo=FALSE,warning=FALSE,message=FALSE,eval=FALSE,fig.width=13,fig.height=4)
 source("query.R")
-#g <- bq()
+
 
 ```
 

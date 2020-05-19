@@ -28,8 +28,11 @@ if(!exists("query.R")){
 }
 
 bq <- function(project = 'moz-fx-data-derived-datasets'
-              ,dataset = 'telemetry'){
-    bq_auth(email='sguha@mozilla.com' ,use_oob =TRUE ) #path = "~/mz/confs/gcloud.json")
+              ,dataset = 'telemetry'
+              ,use_email = NULL
+               ){
+    if(is.null(use_email)) bq_auth(email='sguha@mozilla.com' ,use_oob =TRUE ) #path = "~/mz/confs/gcloud.json")
+    else bq_auth()
     ocon <- dbConnect(
         bigrquery::bigquery(),
         project = project,
