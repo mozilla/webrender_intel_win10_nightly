@@ -21,4 +21,4 @@ COPY . /webrender_intel_win10_nightly
 CMD  Rscript -e "setwd('/webrender_intel_win10_nightly');rmarkdown::render('driver.Rmd');rmarkdown::render('dashboard.Rmd',output_dir='/tmp/output/')"  && gsutil -m  rsync -r -d /tmp/output/   gs://moz-fx-data-prod-analysis/sguha/ds_283/
 
     
-## The webrender repo is set to a hash that runs. if you edit the webrender repo update the hash ...
+
