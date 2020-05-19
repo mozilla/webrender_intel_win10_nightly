@@ -17,8 +17,8 @@ RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.c
 
 COPY . /webrender_intel_win10_nightly 
 
+CMD  /bin/bash /webrender_intel_win10_nightly/run.sh
 
-CMD  Rscript -e "setwd('/webrender_intel_win10_nightly');rmarkdown::render('driver.Rmd');rmarkdown::render('dashboard.Rmd',output_dir='/tmp/output/')"  && gsutil -m  rsync -r -d /tmp/output/   gs://moz-fx-data-prod-analysis/sguha/ds_283/
 
     
 
