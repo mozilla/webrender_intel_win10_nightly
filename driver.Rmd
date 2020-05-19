@@ -351,7 +351,7 @@ g$q("delete from {ds_283_tablename} where buildid>='{min_buildid}'")
 ##system(glue("bq query --format=prettyjson --nouse_legacy_sql 'delete from {ds_283_tablename} where buildid>=\'{min_buildid}\'' "))
 atemp <- tempfile()
 fwrite(allstuff, file=atemp,row.names=FALSE,quote=TRUE,na=0)
-l <- glue("bq load --noreplace    --source_format=CSV --skip_leading_rows=1 --null_marker=NA",
+l <- glue("bq load --noreplace   --project_id='moz-fx-data-bq-data-science'  --source_format=CSV --skip_leading_rows=1 --null_marker=NA",
           " \"{toShellFromSQLName(ds_283_tablename)}\" {atemp} ./dashboard_table.json")
 loginfo(l)
 system(l)
