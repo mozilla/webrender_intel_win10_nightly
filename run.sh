@@ -1,10 +1,16 @@
 #!/bin/bash
 
-BUCKET=moz-fx-data-prod-analysis
 BUCKET=${BUCKET:-gs://moz-fx-data-prod-analysis}
 
-gcloud auth activate-service-account --key-file /app/.credentials
 
+
+if [ -z "$GOOGLE_APPLICATION_CREDENTIALS" ]
+then
+    echo "Creds Set"
+else
+    gcloud auth activate-service-account --key-file /app/.credentials
+fi
+    
 if [ -z "$RUNFAST" ]
 then
     ## Complete run if RUNFAST environment is missing
