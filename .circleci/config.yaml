@@ -1,0 +1,16 @@
+# Reference: https://github.com/mozilla/pensieve/blob/master/.circleci/config.yml
+version: 2.1
+
+# See https://circleci.com/orbs/registry/orb/circleci/gcp-gcr
+orbs:
+  gcp-gcr: circleci/gcp-gcr@0.6.1
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - gcp-gcr/build-and-push-image:
+          image: ds_283_prod
+          filters:
+            branches:
+              only:
+                - master
