@@ -5,7 +5,7 @@ BUCKET=${BUCKET:-gs://moz-fx-data-prod-analysis}
 
 
 if [[ -z "${GOOGLE_APPLICATION_CREDENTIALS}" ]]; then
-    eciho "creds set, not activating"
+    echo "creds set, not activating"
 else
     echo "Activating Credentials"
     gcloud auth activate-service-account --key-file /app/.credentials
