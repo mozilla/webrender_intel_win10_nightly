@@ -18,6 +18,6 @@ RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.c
 RUN git clone https://github.com/mozilla/webrender_intel_win10_nightly.git && cd webrender_intel_win10_nightly  && git reset --hard 58bf57c059179a3ec4a174aba9632298ca03114c
 
 
-CMD  Rscript -e "setwd('/webrender_intel_win10_nightly');rmarkdown::render('driver.Rmd');rmarkdown::render('dashboard.Rmd',output_dir='/tmp/output/')"  && gsutil -m  rsync -r -d /tmp/output/   gs://moz-fx-data-prod-analysis/ds_283/
+CMD  Rscript -e "setwd('/webrender_intel_win10_nightly');rmarkdown::render('driver.Rmd');rmarkdown::render('dashboard.Rmd',output_dir='/tmp/output/')"  && gsutil -m  rsync -r -d /tmp/output/   gs://moz-fx-data-prod-analysis/sguha/ds_283/
 
     
