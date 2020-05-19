@@ -20,20 +20,8 @@ And that ought be it! The dashboard is copied to `gs://moz-fx-data-prod-analysis
 
 ## With Email Based Credentials
 
-Now for testing, I mount my `gargle` cached authentifications(and other google auths too)  into the container and run it like so
-(you might not  need sudo) but you need to edit the `run.sh` file before (and rebuild using the above command) like so
-
-```
-#!/bin/bash
-
-BUCKET=moz-fx-data-prod-analysis
-
-Rscript -e "setwd('/webrender_intel_win10_nightly');library(rmarkdown); render('driver.Rmd');render('dashboard.Rmd',output_dir='/tmp/output/')"
-gsutil -m  rsync -r -d /tmp/output/   gs://$BUCKET/sguha/ds_283/
-gsutil -m  rsync -r  /webrender_intel_win10_nightly/driver.html   gs://$BUCKET/sguha/ds_283/
-```
-
-and then
+Now for testing, I mount my `gargle` cached authentifications(and other google auths too)  into the container and edit `run.sh` removing the parameters to the 
+first render (see [here](https://github.com/mozilla/webrender_intel_win10_nightly/blob/master/run.sh#L17)) command and then
 
 ```
 
