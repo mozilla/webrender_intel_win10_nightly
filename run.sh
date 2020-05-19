@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 BUCKET=${BUCKET:-gs://moz-fx-data-prod-analysis}
 
 
