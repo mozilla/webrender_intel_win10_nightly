@@ -14,5 +14,5 @@ sudo docker run -it  -v ~/.R:/root/.R  -v ~/.config:/root/.config ds_283_prod
 
 
 
-And that ought be it! The dashboard is copied to `gs://moz-fx-data-prod-analysis/ds_283/`.
+And that ought be it! The dashboard is copied to `gs://moz-fx-data-prod-analysis/sguha/ds_283/`.
 
