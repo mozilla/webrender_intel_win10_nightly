@@ -12,7 +12,6 @@ else
 fi
     
 if [[ -z "${RUNFAST}" ]]; then   
-then
     ## Complete run if RUNFAST environment is missing
     echo "Running SLOW"
     Rscript -e "setwd('/webrender_intel_win10_nightly');library(rmarkdown); render('driver.Rmd',param=list(args=list(use_email='use')));render('dashboard.Rmd',output_dir='/tmp/output/')"
