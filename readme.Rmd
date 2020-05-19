@@ -20,11 +20,10 @@ And that ought be it! The dashboard is copied to `gs://moz-fx-data-prod-analysis
 
 ## With Email Based Credentials
 
-Now for testing, I mount my `gargle` cached authentifications(and other google auths too)  into the container and edit `run.sh` removing the parameters to the 
-first render (see [here](https://github.com/mozilla/webrender_intel_win10_nightly/blob/master/run.sh#L17)) command and then
+Now for testing, I mount my `gargle` cached authentifications(and other google auths too)  into the container and then
 
 ```
 
-sudo docker run -it  -v ~/.R:/root/.R  -v ~/.config:/root/.config ds_283_prod
+sudo docker run -it  -v ~/.R:/root/.R  -v ~/.config:/root/.config -e USE_EMAIL=1 ds_283_prod
 
 ```
