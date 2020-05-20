@@ -27,16 +27,23 @@ if(!exists("query.R")){
     query.R <- TRUE
 }
 
-bq <- function(project = 'moz-fx-data-derived-datasets'# 'moz-fx-data-shared-prod'
-              ,dataset = 'telemetry'
-              ,use_email = ""
+bq <- function(
+                                        # project = 'moz-fx-data-derived-datasets'#
+                                        # project = 'moz-fx-data-shared-prod'
+               project='moz-fx-data-bq-data-science'
+              ,dataset = 'sguha'
+              ,path = ""
                ){
-    if(is.null(use_email) || use_email=="") bq_auth(email='sguha@mozilla.com' ,use_oob =TRUE ) #path = "~/mz/confs/gcloud.json")
-    else bq_auth()
+    if(is.null(path) || path==""){
+        bq_auth(email='sguha@mozilla.com' ,use_oob =TRUE )
+    } else {
+        bq_auth(path=path)
+    }
     ocon <- dbConnect(
-        bigrquery::bigquery(),
-        project = project,
-        dataset = dataset)
+        bigrquery::bigquery()
+      , project = project
+      , dataset = dataset
+    )
     w <- dbListTables(ocon)
     adhoc <- function(s,n=200,con=NULL){
         ## be careful with n=-1 !!
