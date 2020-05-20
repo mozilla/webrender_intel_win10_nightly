@@ -35,8 +35,10 @@ bq <- function(
               ,path = ""
                ){
     if(is.null(path) || path==""){
+        message("Using Email Auth")
         bq_auth(email='sguha@mozilla.com' ,use_oob =TRUE )
     } else {
+        message("Using Service Credentials")
         bq_auth(path=path)
     }
     ocon <- dbConnect(
@@ -102,7 +104,7 @@ select
  --DATE(submission_timestamp),
 substr(application.build_id,1,8),
 count(distinct(client_id)) as n,
-       count(distinct(case when udf.get_key(environment.experiments,'{slug}') is not null then client_id else null end)) as nexp
+       count(distinct(case when `moz-fx-data-shared-prod`.udf.get_key(environment.experiments,'{slug}') is not null then client_id else null end)) as nexp
   FROM
         `moz-fx-data-shared-prod`.telemetry.main
     WHERE
@@ -138,7 +140,7 @@ myclients AS (
         client_id                                                                           AS cid,
         submission_timestamp                                                                AS date,
         payload.info.session_id                                                             AS session_id,
-        udf.get_key(environment.experiments,'{slug}').branch                                AS branch,
+        `moz-fx-data-shared-prod`.udf.get_key(environment.experiments,'{slug}').branch                                AS branch,
         substr(application.build_id,1,8)                                                    AS buildid,
         payload.processes.parent.scalars.browser_engagement_active_ticks                    AS active_ticks,
         payload.info.subsession_length                                                      AS subsession_length,
@@ -159,7 +161,7 @@ myclients AS (
     WHERE
         DATE(submission_timestamp)>='{min(starts)}' and DATE(submission_timestamp)<='{max(ends)}'
         AND {dq}
-        AND udf.get_key(environment.experiments,'{slug}').branch IS NOT NULL
+        AND `moz-fx-data-shared-prod`.udf.get_key(environment.experiments,'{slug}').branch IS NOT NULL
         AND normalized_channel = 'nightly'
         AND environment.system.os.name ='Windows_NT'
         AND STARTS_WITH(environment.system.os.version,'10') = TRUE
@@ -227,7 +229,7 @@ check.usage.length.and.crash <- function(tbl,starts,ends,debug=FALSE){
         qq <- glue("
 CREATE TEMP FUNCTION VALUE_SUM(x STRING,gt FLOAT64) AS (
 (with a as (
- select  udf.json_extract_int_map(x) as Y
+ select  `moz-fx-data-shared-prod`.udf.json_extract_int_map(x) as Y
 )
 select sum(coalesce(value,0))  from a cross join unnest(Y) where key> gt
 )
@@ -313,7 +315,7 @@ histogram.aggregate.raw <- function(H,table,n=-1){
     base1 <- "a as (
 select
 id, buildid,branch,
-udf.json_extract_int_map({H}) as x
+`moz-fx-data-shared-prod`.udf.json_extract_int_map({H}) as x
 from {table}
 ),
 b as ( select id, buildid,branch,key,coalesce(value,0)  as value  from a cross join unnest(x)),
@@ -334,7 +336,7 @@ histogram.aggregate.all <- function(H,table, n=-1){
     base1 <- "a as (
 select
 id, buildid,branch,
-udf.json_extract_int_map({H}) as x
+`moz-fx-data-shared-prod`.udf.json_extract_int_map({H}) as x
 from {table}
 ),
 b0 as ( select  id,buildid,branch,key,sum(coalesce(value,0)) as value from a cross join unnest(x)  group by 1,2,3,4 ),
