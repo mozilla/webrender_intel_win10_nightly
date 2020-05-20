@@ -5,11 +5,12 @@ jobs:
   # command for building an image with docker caching layer enabled
   build-and-push:
     # https://github.com/CircleCI-Public/gcp-gcr-orb/blob/master/src/executors/default.yml
-    machine:
-      image: circleci/classic:latest
-      docker_layer_caching: true
+    docker:
+      - image: google/cloud-sdk
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - gcp-gcr/gcr-auth
       - gcp-gcr/build-image:
           image: ds_283_prod
