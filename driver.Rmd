@@ -75,9 +75,10 @@ source("query.R")
 ## args(max.build.id = starting buildid, default is computed from existing table,
 ##      end.build = ending.build , default is yesterday
 ##      )
+
 args <- params$args
 is.debug <- if(!is.null(args$debug)) args$debug else FALSE
-g <- bq(path=args$path)
+##g <- bq(path=args$path)
 
 #args <- list(max.build.id='2020-04-01')
 ## is.debug <- TRUE
