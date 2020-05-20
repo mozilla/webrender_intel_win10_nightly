@@ -73,7 +73,7 @@ source("query.R")
 
 ## args can have two params
 ## args(max.build.id = starting buildid, default is computed from existing table,
-##      end.build = ending.build , default is yesterday
+##      end.build.id = ending.build , default is yesterday
 ##      )
 
 args <- params$args
@@ -94,8 +94,10 @@ this is for nightly, we will
 
 - look up a database to see what was the last-build-id processed for
 - get data for build-ids since then and now.
+- you can provide your own via `max.build.id` (YYYYMMDD)
 
 ```{r eval=TRUE}
+
 if(is.null(args$max.build.id)){
     max.build.id <-tryCatch({
         V <- g$q("select min(buildid) as V from {ds_283_tablename} where DATE_DIFF(date_computed,PARSE_DATE('%Y%m%d',buildid),DAY)<{SEVEN}")$V
@@ -104,7 +106,7 @@ if(is.null(args$max.build.id)){
     },error=function(e){
         experiment.start
     })
-}else max.build.id <- args$max.build.id
+}else max.build.id <- as.Date(args$max.build.id,'%Y%m%d')
 max.build.id <- as.Date(max.build.id)
 loginfo(glue("Upto {max.build.id}"))
 ```
@@ -113,11 +115,12 @@ We get `r SEVEN` days of data for a `buildid`, however nearly 90% of the data
 comes within 4 days of release (and about 50% within 1 day).
 
 ```{r eval=TRUE}
+
 data.collection.dates <- local({
     if(!is.null(args$end.build)){
-        end.date <- as.Date(args$end.build)
+        end.date <- as.Date(args$end.build.id,'%Y%m%d')
     }else end.date <- Sys.Date()-1
-    print(end.date)
+    print(c("using end date",end.date))
     f <- data.table(buildid = seq(max.build.id,to=end.date,by=1))
     f[, ":="(start = buildid,end = buildid+SEVEN)]
     f[, ":="(buildid = strftime(buildid,"%Y%m%d"))]

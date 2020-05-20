@@ -3,6 +3,7 @@ set -e
 export BUCKET=${BUCKET:-gs://moz-fx-data-prod-analysis}
 export PROJECT_ID=${PROJECT_ID:-moz-fx-data-bq-data-science}
 export DATASET=${DATASET:-sguha}
+## Set START_BUILD=YYYYMMDD for the start build from when computations begin
 
 if [[ -z "${GOOGLE_APPLICATION_CREDENTIALS}" ]]; then
     echo "creds set, not activating"
