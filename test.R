@@ -1,0 +1,6 @@
+setwd('/webrender_intel_win10_nightly');
+source('query.R');
+print(c(project=Sys.getenv("PROJECT_ID"), dataset=Sys.getenv("DATASET")))
+g=bq(project=Sys.getenv("PROJECT_ID"), dataset=Sys.getenv("DATASET"),path=Sys.getenv('GOOGLE_APPLICATION_CREDENTIALS'));
+print(g$q('select client_id from `moz-fx-data-shared-prod`.telemetry.main where date(submission_timestamp)=\'2020-01-01\' limit 10'))
+
