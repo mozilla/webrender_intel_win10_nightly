@@ -68,7 +68,7 @@ h3, .h3 {
 ```{r echo=FALSE,warning=FALSE, message=FALSE}
 
 library(knitr)
-knitr::opts_chunk$set(  cache=FALSE,echo=FALSE,warning=FALSE,message=FALSE,eval=FALSE,fig.width=13,fig.height=4)
+knitr::opts_chunk$set(  cache=FALSE,echo=TRUE,warning=FALSE,message=FALSE,eval=FALSE,fig.width=13,fig.height=4)
 source("query.R")
 
 ## args can have two params
