@@ -17,6 +17,9 @@ RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.c
 
 COPY . /webrender_intel_win10_nightly 
 
+#RUN echo "project_id = moz-fx-ds-283" > /root/.bigqueryrc
+RUN echo "project_id = moz-fx-data-shared-prod" > /root/.bigqueryrc
+
 CMD  /bin/bash /webrender_intel_win10_nightly/run.sh
 
 
