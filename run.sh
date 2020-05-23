@@ -22,7 +22,7 @@ else
     ## Quick Check if RUNFAST environment is passed
     echo "Running FAST"
     bq query --project_id "$PROJECT_ID" --use_legacy_sql=false "select client_id from \`moz-fx-data-shared-prod\`.telemetry.main where date(submission_timestamp)='2020-01-01' limit 10"
-    Rscript /webrender_intel_win10_nightly/test.R 
     gsutil cp /webrender_intel_win10_nightly/driver.Rmd $BUCKET/sguha/ds_283/
+    Rscript /webrender_intel_win10_nightly/test.R 
 fi
 
