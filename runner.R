@@ -1,6 +1,7 @@
 setwd('/webrender_intel_win10_nightly');
 source("query.R")
-print(c(project=Sys.getenv("PROJECT_ID"), dataset=Sys.getenv("DATASET")))
+env_vars = c(project=Sys.getenv("PROJECT_ID"), dataset=Sys.getenv("DATASET"))
+print(env_vars)
 print(Sys.Date())
 g = bq(project=Sys.getenv("PROJECT_ID"), dataset=Sys.getenv("DATASET"),path=Sys.getenv('GOOGLE_APPLICATION_CREDENTIALS'))
 
