@@ -96,7 +96,7 @@ this is for nightly, we will
 - get data for build-ids since then and now.
 - you can provide your own via `max.build.id` (YYYYMMDD)
 
-```{r eval=TRUE}
+```{r f2,eval=TRUE}
 
 if(is.null(args$max.build.id)){
     max.build.id <-tryCatch({
@@ -114,7 +114,7 @@ loginfo(glue("Upto {max.build.id}"))
 We get `r SEVEN` days of data for a `buildid`, however nearly 90% of the data
 comes within 4 days of release (and about 50% within 1 day).
 
-```{r eval=TRUE}
+```{r f3,eval=TRUE}
 
 data.collection.dates <- local({
     if(!is.null(args$end.build)){
@@ -136,7 +136,7 @@ Now go ahead and get all the data for profiles.
 - on these build-ids
 - with data on  these dates
 
-```{r query,eval=TRUE}
+```{r f4,query,eval=TRUE}
 
 source("query.R")
 #data.collection.dates[,count.avg.popln.size(buildid,start,end)]
@@ -151,14 +151,14 @@ head(new.data)
 
 Enrollment Status
 
-```{r eval=TRUE}
+```{r f5,eval=TRUE}
 (enrollment.status <- check.enrollment.status(ds_283_tablename_tmp))
 
 ```
 
 Usage Length
 
-```{r eval=TRUE}
+```{r f6,eval=TRUE}
 
 compare.usage <- check.usage.length.and.crash(ds_283_tablename_tmp,
                                     starts = data.collection.dates$start,
@@ -231,7 +231,7 @@ Now the histograms
 
 per cent frames exceeding 200% vsync. 
 
-```{r content_frame_time_vsync,eval=TRUE}
+```{r fcontent_frame_time_vsync,eval=TRUE}
 
 content_frame_time_vsync.h <- histogram.aggregate.all("content_frame_time_vsync", table=ds_283_tablename_tmp)
 content_frame_time_vsync.gt.200 <- histogram.summary.cuts(content_frame_time_vsync.h   ,CUT=200) 
@@ -312,7 +312,7 @@ content_frame_time.gt.192 <- histogram.summary.cuts(content_frame_time.h,CUT=192
 ```
 
 
-```{r eval=TRUE}
+```{r f8,eval=TRUE}
 
 allstuff <- rbindlist(
     list(
@@ -348,7 +348,7 @@ allstuff[, .N, by=buildid]
 ```
 
 
-```{r eval=if(is.debug) FALSE else TRUE}
+```{r f9,eval=if(is.debug) FALSE else TRUE}
 
 ## Delete from the original table _anything_ that has buildids listed here
 ## which is any buildid larger than the minimum buildid we have
