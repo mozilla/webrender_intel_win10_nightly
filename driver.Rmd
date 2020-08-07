@@ -195,7 +195,7 @@ ncrash.shutdown.cmp <- compare.usage[ncrash_shutdown/(1/3600+total_hours)<quanti
                                 mAndCi(.SD[,list(id,branch,x=1000*ncrash_shutdown/(1/3600+total_hours))], "x",REPLICATES,oper=Mean)
                                ,by=buildid][, label := 'ncrash_shutdown_perkhr'][order(buildid,what),]
 
-ncrash.oom.cmp <- compare.usage[ncrash_oom/(1/3600+total_hours)<quantile(ncrash_oom/(1/3600+total_hours),0.999),
+ncrash.oom.cmp <- compare.usage[ncrash_oom/(1/3600+total_hours)<=quantile(ncrash_oom/(1/3600+total_hours),1),
                                 mAndCi(.SD[,list(id,branch,x=1000*ncrash_oom/(1/3600+total_hours))], "x",REPLICATES,oper=Mean)
                                ,by=buildid][, label := 'ncrash_oom_perkhr'][order(buildid,what),]
 
