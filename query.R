@@ -479,7 +479,7 @@ histogram.summary <- function (histo, REP=500,sm = list(t= mean,i=function(s) s)
         mean_estimates <- as.numeric(apply(D, 1, function(k) {
             sm$t(sample(key,10000, prob=k, replace=TRUE))
             }))
-        stats <- c(avg = sm$i(mean(mean_estimates)),
+        stats <- c(avg = mean(sm$i(mean_estimates)),
                    lower = sm$i(as.numeric(quantile(mean_estimates,0.05/2))),
                    upper = sm$i(as.numeric(quantile(mean_estimates, 1-0.05/2))))
         data.table(nreporting = nreporting[1], 
@@ -493,10 +493,10 @@ histogram.summary <- function (histo, REP=500,sm = list(t= mean,i=function(s) s)
         Ddis <- dirch(dis$psum, REP)
         Dena <- dirch(ena$psum, REP)
         dis_mean_estimates <- as.numeric(apply(Ddis, 1, function(k) {
-            mean(sample(dis$key,10000, prob=k, replace=TRUE))
+            sm$i(sm$t(mean(sample(dis$key,10000, prob=k, replace=TRUE))))
         }))
         ena_mean_estimates <- as.numeric(apply(Dena, 1, function(k) {
-            mean(sample(ena$key,10000, prob=k, replace=TRUE))
+            sm$i(sm$t(mean(sample(ena$key,10000, prob=k, replace=TRUE))))
         }))
         mean_estimates <- (ena_mean_estimates - dis_mean_estimates)/dis_mean_estimates*100
         stats <- c(avg = mean(mean_estimates,na.rm=TRUE),
