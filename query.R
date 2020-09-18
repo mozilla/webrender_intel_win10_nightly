@@ -36,7 +36,7 @@ bq <- function(
                ){
     if(is.null(path) || path==""){
         message("Using Email Auth")
-        bq_auth(email='sguha@mozilla.com' ,use_oob =TRUE )
+        bq_auth(use_oob=TRUE)
     } else {
         message("Using Service Credentials")
         bq_auth(path=path)
