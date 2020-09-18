@@ -1,6 +1,6 @@
 FROM rocker/verse:3.5.0
 RUN mkdir /tmp/output/
-RUN R -e "options(repos =  list(CRAN = 'https://cran.microsoft.com/snapshot/2020-04-10/')); \
+RUN R -e "options(repos =  list(CRAN = 'https://cran.microsoft.com/snapshot/2020-05-07/')); \
           pkgs <- c('vegawidget','parsedate','logging', 'Hmisc', 'ggplot2','glue','DBI','bigrquery','gargle','data.table','knitr','rmarkdown'); \
           install.packages(pkgs,dep=TRUE);"
 
