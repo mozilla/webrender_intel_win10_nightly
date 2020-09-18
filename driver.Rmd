@@ -185,6 +185,7 @@ total.hours.cmp <- compare.usage[
     mAndCi(.SD[, list(id, branch, x = total_hours)], "x", REPLICATES, oper = Mean),
     by = buildid
 ][, label := "total_hours"][order(buildid, what), ]
+
 total.urisperhr.cmp <- compare.usage[
     total_uri / (1 / 3600 + active_hours) < quantile(total_uri / (1 / 3600 + active_hours), 0.999),
     mAndCi(.SD[, list(id, branch, x = total_uri / (1 / 3600 + active_hours))], "x", REPLICATES, oper = Mean),
@@ -193,26 +194,26 @@ total.urisperhr.cmp <- compare.usage[
 
 
 ncrash.all.cmp <- compare.usage[
-    ncrash_all / (1 / 3600 + total_hours) < quantile(ncrash_all / (1 / 3600 + total_hours), 0.999),
+    ,
     mAndCi(.SD[, list(id, branch, x = 1000 * ncrash_all / (1 / 3600 + total_hours))], "x", REPLICATES, oper = Mean),
     by = buildid
 ][, label := "ncrash_all_perkhr"][order(buildid, what), ]
 
 ncrash.content.cmp <- compare.usage[
-    ncrash_content / (1 / 3600 + total_hours) < quantile(ncrash_content / (1 / 3600 + total_hours), 0.999),
+    ,
     mAndCi(.SD[, list(id, branch, x = ncrash_content / (1 / 3600 + total_hours))], "x", REPLICATES, oper = mean),
     by = buildid
 ][, label := "ncrash_content_perkhr"][order(buildid, what), ]
 ncrash.content.cmp <- ncrash.content.cmp [, ":="(est = est * 1000, low = low * 1000, high = high * 1000)]
 
 ncrash.main.cmp <- compare.usage[
-    ncrash_main / (1 / 3600 + total_hours) < quantile(ncrash_main / (1 / 3600 + total_hours), 0.999),
+    ,
     mAndCi(.SD[, list(id, branch, x = 1000 * ncrash_main / (1 / 3600 + total_hours))], "x", REPLICATES, oper = Mean),
     by = buildid
 ][, label := "ncrash_main_perkhr"][order(buildid, what), ]
 
 ncrash.shutdown.cmp <- compare.usage[
-    ncrash_shutdown / (1 / 3600 + total_hours) < quantile(ncrash_shutdown / (1 / 3600 + total_hours), 0.999),
+    ,
     mAndCi(.SD[, list(id, branch, x = 1000 * ncrash_shutdown / (1 / 3600 + total_hours))], "x", REPLICATES, oper = Mean),
     by = buildid
 ][, label := "ncrash_shutdown_perkhr"][order(buildid, what), ]
