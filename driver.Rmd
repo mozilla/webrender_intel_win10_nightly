@@ -68,7 +68,7 @@ h3, .h3 {
 ```{r echo=FALSE,warning=FALSE, message=FALSE}
 
 library(knitr)
-knitr::opts_chunk$set(  cache=FALSE,echo=TRUE,warning=FALSE,message=FALSE,eval=FALSE,fig.width=13,fig.height=4)
+knitr::opts_chunk$set(cache = FALSE, echo = TRUE, warning = FALSE, message = FALSE, eval = FALSE, fig.width = 13, fig.height = 4)
 source("query.R")
 
 ## args can have two params
@@ -77,15 +77,16 @@ source("query.R")
 ##      )
 
 args <- params$args
-is.debug <- if(!is.null(args$debug)) args$debug else FALSE
-##g <- bq(path=args$path)
+is.debug <- if (!is.null(args$debug)) args$debug else FALSE
+## g <- bq(path=args$path)
 
-#args <- list(max.build.id='2020-04-01')
+# args <- list(max.build.id='2020-04-01')
 ## is.debug <- TRUE
 ```
 
 
 ```{r f1,eval=TRUE}
+
 ```
 
 
@@ -98,15 +99,20 @@ this is for nightly, we will
 
 ```{r f2,eval=TRUE}
 
-if(is.null(args$max.build.id)){
-    max.build.id <-tryCatch({
-        V <- g$q("select min(buildid) as V from {ds_283_tablename} where DATE_DIFF(date_computed,PARSE_DATE('%Y%m%d',buildid),DAY)<{SEVEN}")$V
-        if(is.na(V)) stop()
-        as.Date(V,'%Y%m%d')
-    },error=function(e){
-        experiment.start
-    })
-}else max.build.id <- as.Date(args$max.build.id,'%Y%m%d')
+if (is.null(args$max.build.id)) {
+    max.build.id <- tryCatch(
+        {
+            V <- g$q("select min(buildid) as V from {ds_283_tablename} where DATE_DIFF(date_computed,PARSE_DATE('%Y%m%d',buildid),DAY)<{SEVEN}")$V
+            if (is.na(V)) stop()
+            as.Date(V, "%Y%m%d")
+        },
+        error = function(e) {
+            experiment.start
+        }
+    )
+} else {
+    max.build.id <- as.Date(args$max.build.id, "%Y%m%d")
+}
 max.build.id <- as.Date(max.build.id)
 loginfo(glue("Upto {max.build.id}"))
 ```
@@ -117,17 +123,18 @@ comes within 4 days of release (and about 50% within 1 day).
 ```{r f3,eval=TRUE}
 
 data.collection.dates <- local({
-    if(!is.null(args$end.build)){
-        end.date <- as.Date(args$end.build.id,'%Y%m%d')
-    }else end.date <- Sys.Date()-1
-    print(c("using end date",end.date))
-    f <- data.table(buildid = seq(max.build.id,to=end.date,by=1))
-    f[, ":="(start = buildid,end = buildid+SEVEN)]
-    f[, ":="(buildid = strftime(buildid,"%Y%m%d"))]
-    f[buildid >='20200401',]
+    if (!is.null(args$end.build)) {
+        end.date <- as.Date(args$end.build.id, "%Y%m%d")
+    } else {
+        end.date <- Sys.Date() - 1
+    }
+    print(c("using end date", end.date))
+    f <- data.table(buildid = seq(max.build.id, to = end.date, by = 1))
+    f[, ":="(start = buildid, end = buildid + SEVEN)]
+    f[, ":="(buildid = strftime(buildid, "%Y%m%d"))]
+    f[buildid >= "20200401", ]
 })
 print(data.collection.dates)
-
 ```
 
 Now go ahead and get all the data for profiles. 
@@ -139,13 +146,14 @@ Now go ahead and get all the data for profiles.
 ```{r f4,query,eval=TRUE}
 
 source("query.R")
-#data.collection.dates[,count.avg.popln.size(buildid,start,end)]
-new.data <- get.data(builds = data.collection.dates$buildid,
-                     starts = data.collection.dates$start,
-                     ends = data.collection.dates$end,
-                     ds_283_tablename_tmp,
-                     slug=slug
-                     )
+# data.collection.dates[,count.avg.popln.size(buildid,start,end)]
+new.data <- get.data(
+    builds = data.collection.dates$buildid,
+    starts = data.collection.dates$start,
+    ends = data.collection.dates$end,
+    ds_283_tablename_tmp,
+    slug = slug
+)
 head(new.data)
 ```
 
@@ -153,7 +161,6 @@ Enrollment Status
 
 ```{r f5,eval=TRUE}
 (enrollment.status <- check.enrollment.status(ds_283_tablename_tmp))
-
 ```
 
 Usage Length
@@ -161,66 +168,87 @@ Usage Length
 ```{r f6,eval=TRUE}
 
 compare.usage <- check.usage.length.and.crash(ds_283_tablename_tmp,
-                                    starts = data.collection.dates$start,
-                                    ends =  data.collection.dates$end)
+    starts = data.collection.dates$start,
+    ends = data.collection.dates$end
+)
 
 
-Mean=mean
-active.hours.cmp <- compare.usage[active_hours<quantile(active_hours,0.999),
-                                  mAndCi(.SD[,list(id,branch,x=active_hours)], "x",REPLICATES,oper=Mean)
-                                 ,by=buildid][, label := 'active_hours'][order(buildid,what),]
-total.hours.cmp <- compare.usage[total_hours<quantile(total_hours,0.999),
-                                  mAndCi(.SD[,list(id,branch,x=total_hours)], "x",REPLICATES,oper=Mean)
-                                 ,by=buildid][, label := 'total_hours'][order(buildid,what),]
-total.urisperhr.cmp <- compare.usage[total_uri/(1/3600+active_hours)<quantile(total_uri/(1/3600+active_hours),0.999),
-                                  mAndCi(.SD[,list(id,branch,x=total_uri/(1/3600+active_hours))], "x",REPLICATES,oper=Mean)
-                                 ,by=buildid][, label := 'uri_per_profile_activehour'][order(buildid,what),]
+Mean <- mean
+active.hours.cmp <- compare.usage[
+    active_hours < quantile(active_hours, 0.999),
+    mAndCi(.SD[, list(id, branch, x = active_hours)], "x", REPLICATES, oper = Mean),
+    by = buildid
+][, label := "active_hours"][order(buildid, what), ]
+
+total.hours.cmp <- compare.usage[
+    total_hours < quantile(total_hours, 0.999),
+    mAndCi(.SD[, list(id, branch, x = total_hours)], "x", REPLICATES, oper = Mean),
+    by = buildid
+][, label := "total_hours"][order(buildid, what), ]
+total.urisperhr.cmp <- compare.usage[
+    total_uri / (1 / 3600 + active_hours) < quantile(total_uri / (1 / 3600 + active_hours), 0.999),
+    mAndCi(.SD[, list(id, branch, x = total_uri / (1 / 3600 + active_hours))], "x", REPLICATES, oper = Mean),
+    by = buildid
+][, label := "uri_per_profile_activehour"][order(buildid, what), ]
 
 
+ncrash.all.cmp <- compare.usage[
+    ncrash_all / (1 / 3600 + total_hours) < quantile(ncrash_all / (1 / 3600 + total_hours), 0.999),
+    mAndCi(.SD[, list(id, branch, x = 1000 * ncrash_all / (1 / 3600 + total_hours))], "x", REPLICATES, oper = Mean),
+    by = buildid
+][, label := "ncrash_all_perkhr"][order(buildid, what), ]
 
-ncrash.all.cmp <- compare.usage[ncrash_all/(1/3600+total_hours)<quantile(ncrash_all/(1/3600+total_hours),0.999),
-                                mAndCi(.SD[,list(id,branch,x=1000*ncrash_all/(1/3600+total_hours))], "x",REPLICATES,oper=Mean)
-                               ,by=buildid][, label := 'ncrash_all_perkhr'][order(buildid,what),]
+ncrash.content.cmp <- compare.usage[
+    ncrash_content / (1 / 3600 + total_hours) < quantile(ncrash_content / (1 / 3600 + total_hours), 0.999),
+    mAndCi(.SD[, list(id, branch, x = ncrash_content / (1 / 3600 + total_hours))], "x", REPLICATES, oper = mean),
+    by = buildid
+][, label := "ncrash_content_perkhr"][order(buildid, what), ]
+ncrash.content.cmp <- ncrash.content.cmp [, ":="(est = est * 1000, low = low * 1000, high = high * 1000)]
 
-ncrash.content.cmp <- compare.usage[ncrash_content/(1/3600+total_hours)<quantile(ncrash_content/(1/3600+total_hours),0.999),
-                                mAndCi(.SD[,list(id,branch,x=ncrash_content/(1/3600+total_hours))], "x",REPLICATES,oper=mean)
-                               ,by=buildid][, label := 'ncrash_content_perkhr'][order(buildid,what),]
-ncrash.content.cmp  <- ncrash.content.cmp [, ":="(est=est*1000,low=low*1000, high=high*1000)]
+ncrash.main.cmp <- compare.usage[
+    ncrash_main / (1 / 3600 + total_hours) < quantile(ncrash_main / (1 / 3600 + total_hours), 0.999),
+    mAndCi(.SD[, list(id, branch, x = 1000 * ncrash_main / (1 / 3600 + total_hours))], "x", REPLICATES, oper = Mean),
+    by = buildid
+][, label := "ncrash_main_perkhr"][order(buildid, what), ]
 
-ncrash.main.cmp <- compare.usage[ncrash_main/(1/3600+total_hours)<quantile(ncrash_main/(1/3600+total_hours),0.999),
-                                mAndCi(.SD[,list(id,branch,x=1000*ncrash_main/(1/3600+total_hours))], "x",REPLICATES,oper=Mean)
-                               ,by=buildid][, label := 'ncrash_main_perkhr'][order(buildid,what),]
+ncrash.shutdown.cmp <- compare.usage[
+    ncrash_shutdown / (1 / 3600 + total_hours) < quantile(ncrash_shutdown / (1 / 3600 + total_hours), 0.999),
+    mAndCi(.SD[, list(id, branch, x = 1000 * ncrash_shutdown / (1 / 3600 + total_hours))], "x", REPLICATES, oper = Mean),
+    by = buildid
+][, label := "ncrash_shutdown_perkhr"][order(buildid, what), ]
 
-ncrash.shutdown.cmp <- compare.usage[ncrash_shutdown/(1/3600+total_hours)<quantile(ncrash_shutdown/(1/3600+total_hours),0.999),
-                                mAndCi(.SD[,list(id,branch,x=1000*ncrash_shutdown/(1/3600+total_hours))], "x",REPLICATES,oper=Mean)
-                               ,by=buildid][, label := 'ncrash_shutdown_perkhr'][order(buildid,what),]
-
-##ncrash.oom.cmp <- compare.usage[ncrash_oom/(1/3600+total_hours)<=quantile(ncrash_oom/(1/3600+total_hours),1),
+## ncrash.oom.cmp <- compare.usage[ncrash_oom/(1/3600+total_hours)<=quantile(ncrash_oom/(1/3600+total_hours),1),
 ##                                mAndCi(.SD[,list(id,branch,x=1000*ncrash_oom/(1/3600+total_hours))], "x",REPLICATES,oper=Mean)
 ##                               ,by=buildid][, label := 'ncrash_oom_perkhr'][order(buildid,what),]
 
 ## notably this has no upper bound
-ncrash.gpu.cmp <- compare.usage[ncrash_gpu/(1/3600+total_hours)<quantile(ncrash_gpu/(1/3600+total_hours),1),
-                                mAndCi(.SD[,list(id,branch,x=1000*ncrash_gpu/(1/3600+total_hours))], "x",REPLICATES,oper=Mean)
-                               ,by=buildid][, label := 'ncrash_gpu_perkhr'][order(buildid,what),]
+ncrash.gpu.cmp <- compare.usage[
+    ncrash_gpu / (1 / 3600 + total_hours) < quantile(ncrash_gpu / (1 / 3600 + total_hours), 1),
+    mAndCi(.SD[, list(id, branch, x = 1000 * ncrash_gpu / (1 / 3600 + total_hours))], "x", REPLICATES, oper = Mean),
+    by = buildid
+][, label := "ncrash_gpu_perkhr"][order(buildid, what), ]
 
 
-device.reset.cmp <- compare.usage[device_resets/(1/3600+total_hours)<quantile(device_resets/(1/3600+total_hours),0.999),
-                                mAndCi(.SD[,list(id,branch,x=device_resets/(1/3600+total_hours))], "x",REPLICATES,oper=Emean)
-                               ,by=buildid][, label := 'crash_device_resets_perkhr'][order(buildid,what),]
-device.reset.cmp  <- device.reset.cmp [, ":="(est=est*1000,low=low*1000, high=high*1000)]
+device.reset.cmp <- compare.usage[
+    device_resets / (1 / 3600 + total_hours) < quantile(device_resets / (1 / 3600 + total_hours), 0.999),
+    mAndCi(.SD[, list(id, branch, x = device_resets / (1 / 3600 + total_hours))], "x", REPLICATES, oper = Emean),
+    by = buildid
+][, label := "crash_device_resets_perkhr"][order(buildid, what), ]
+device.reset.cmp <- device.reset.cmp [, ":="(est = est * 1000, low = low * 1000, high = high * 1000)]
 
-checker.cmp <- compare.usage[checkerboard_severe_events/(1/3600+total_hours)<quantile(checkerboard_severe_events/(1/3600+total_hours),0.999),
-                                mAndCi(.SD[,list(id,branch,x=checkerboard_severe_events/(1/3600+total_hours))], "x",REPLICATES,oper=Emean)
-                            ,by=buildid][, label := 'severe_checkerboard_perkhr'][order(buildid,what),]
-checker.cmp  <- checker.cmp [, ":="(est=est*1000,low=low*1000, high=high*1000)]
+checker.cmp <- compare.usage[
+    checkerboard_severe_events / (1 / 3600 + total_hours) < quantile(checkerboard_severe_events / (1 / 3600 + total_hours), 0.999),
+    mAndCi(.SD[, list(id, branch, x = checkerboard_severe_events / (1 / 3600 + total_hours))], "x", REPLICATES, oper = Emean),
+    by = buildid
+][, label := "severe_checkerboard_perkhr"][order(buildid, what), ]
+checker.cmp <- checker.cmp [, ":="(est = est * 1000, low = low * 1000, high = high * 1000)]
 
-ncrash_all.inci.cmp <- compare.usage[, mAndCi(.SD[,list(id,branch,x=ncrash_all > 0)], "x",REPLICATES,oper=Mean)
-                               ,by=buildid][, label := 'ncrash_all_inci'][order(buildid,what),]
-device_resets.inci.cmp <- compare.usage[, mAndCi(.SD[,list(id,branch,x=device_resets > 0)], "x",REPLICATES,oper=Mean)
-                               ,by=buildid][, label := 'device_reset_inci'][order(buildid,what),]
-
-
+ncrash_all.inci.cmp <- compare.usage[, mAndCi(.SD[, list(id, branch, x = ncrash_all > 0)], "x", REPLICATES, oper = Mean),
+    by = buildid
+][, label := "ncrash_all_inci"][order(buildid, what), ]
+device_resets.inci.cmp <- compare.usage[, mAndCi(.SD[, list(id, branch, x = device_resets > 0)], "x", REPLICATES, oper = Mean),
+    by = buildid
+][, label := "device_reset_inci"][order(buildid, what), ]
 ```
 
 
@@ -233,30 +261,27 @@ per cent frames exceeding 200% vsync.
 
 ```{r fcontent_frame_time_vsync,eval=TRUE}
 
-content_frame_time_vsync.h <- histogram.aggregate.all("content_frame_time_vsync", table=ds_283_tablename_tmp)
-content_frame_time_vsync.gt.200 <- histogram.summary.cuts(content_frame_time_vsync.h   ,CUT=200) 
-(content_frame_time_vsync.gt.200 <- content_frame_time_vsync.gt.200 [, label := "content_frame_time_vsync_200"][,])
-
+content_frame_time_vsync.h <- histogram.aggregate.all("content_frame_time_vsync", table = ds_283_tablename_tmp)
+content_frame_time_vsync.gt.200 <- histogram.summary.cuts(content_frame_time_vsync.h, CUT = 200)
+(content_frame_time_vsync.gt.200 <- content_frame_time_vsync.gt.200 [, label := "content_frame_time_vsync_200"][, ])
 ```
 
 2. tab switch (fx_tab_switch_composite)
 
 ```{r fx.tab.switch.composite,eval=TRUE}
 
-tab_switch_composite.h <- histogram.aggregate.all("tab_switch_ms",table=ds_283_tablename_tmp)
+tab_switch_composite.h <- histogram.aggregate.all("tab_switch_ms", table = ds_283_tablename_tmp)
 tab_switch_composite <- histogram.summary(tab_switch_composite.h)
-(tab_switch_composite <- tab_switch_composite[, label := "tab_switch_ms"][,])
-
+(tab_switch_composite <- tab_switch_composite[, label := "tab_switch_ms"][, ])
 ```
 
 3. fx_page_load
 
 ```{r page_load_ms,eval=TRUE}
 
-page_load_ms.h <- histogram.aggregate.all("page_load_ms",table=ds_283_tablename_tmp)
+page_load_ms.h <- histogram.aggregate.all("page_load_ms", table = ds_283_tablename_tmp)
 page_load_ms <- histogram.summary(page_load_ms.h)
-(page_load_ms <- page_load_ms[, label := "page_load_ms"][,])
-
+(page_load_ms <- page_load_ms[, label := "page_load_ms"][, ])
 ```
 
 4. content_paint_full_time
@@ -264,51 +289,46 @@ page_load_ms <- histogram.summary(page_load_ms.h)
 
 ```{r content_full_paint_time,eval=TRUE}
 
-content_full_paint_time.h <- histogram.aggregate.all("content_full_paint_time",table=ds_283_tablename_tmp)
+content_full_paint_time.h <- histogram.aggregate.all("content_full_paint_time", table = ds_283_tablename_tmp)
 content_full_paint_time <- histogram.summary(content_full_paint_time.h)
-(content_full_paint_time <- content_full_paint_time[, label := "content_full_paint_time"][,])
+(content_full_paint_time <- content_full_paint_time[, label := "content_full_paint_time"][, ])
 
-content_full_paint_time.gt.16ms <- histogram.summary.cuts(content_full_paint_time.h,CUT=16)
-(content_full_paint_time.gt.16ms <- content_full_paint_time.gt.16ms[, label := "content_full_paint_time_16"][,])
-
-
+content_full_paint_time.gt.16ms <- histogram.summary.cuts(content_full_paint_time.h, CUT = 16)
+(content_full_paint_time.gt.16ms <- content_full_paint_time.gt.16ms[, label := "content_full_paint_time_16"][, ])
 ```
 
 5. content_paint_time
 
 ```{r content_paint_time,eval=TRUE}
-content_paint_time.h <- histogram.aggregate.all("content_paint_time",table=ds_283_tablename_tmp)
+content_paint_time.h <- histogram.aggregate.all("content_paint_time", table = ds_283_tablename_tmp)
 content_paint_time <- histogram.summary(content_paint_time.h, REPLICATES.2)
-(content_paint_time <- content_paint_time[, label := "content_paint_time"][,])
+(content_paint_time <- content_paint_time[, label := "content_paint_time"][, ])
 
-content_paint_time.99 <- histogram.summary.percentiles(content_paint_time.h,perc=0.99)
-(content_paint_time.99 <- content_paint_time.99[, label := "content_paint_time_99"][,])
+content_paint_time.99 <- histogram.summary.percentiles(content_paint_time.h, perc = 0.99)
+(content_paint_time.99 <- content_paint_time.99[, label := "content_paint_time_99"][, ])
 
-content_paint_time.gt.16ms <- histogram.summary.cuts(content_paint_time.h,CUT=16)
-(content_paint_time.gt.16ms <- content_paint_time.gt.16ms[, label := "content_paint_time_16"][,])
-
+content_paint_time.gt.16ms <- histogram.summary.cuts(content_paint_time.h, CUT = 16)
+(content_paint_time.gt.16ms <- content_paint_time.gt.16ms[, label := "content_paint_time_16"][, ])
 ```
 
 6.composite_time
 
 ```{r composite_time,eval=TRUE}
-composite_time.h <- histogram.aggregate.all("composite_time",table=ds_283_tablename_tmp)
+composite_time.h <- histogram.aggregate.all("composite_time", table = ds_283_tablename_tmp)
 composite_time <- histogram.summary(composite_time.h)
-(composite_time <- composite_time[, label := "composite_time"][,])
+(composite_time <- composite_time[, label := "composite_time"][, ])
 
-composite_time.gt.16ms <- histogram.summary.cuts(composite_time.h,CUT=16)
-(composite_time.gt.16ms <- composite_time.gt.16ms[, label := "composite_time_16"][,])
-
+composite_time.gt.16ms <- histogram.summary.cuts(composite_time.h, CUT = 16)
+(composite_time.gt.16ms <- composite_time.gt.16ms[, label := "composite_time_16"][, ])
 ```
 
 
 7. content_frame_time
 
 ```{r content_frame_time,eval=TRUE}
-content_frame_time.h <- histogram.aggregate.all("content_frame_time",table=ds_283_tablename_tmp)
-content_frame_time.gt.192 <- histogram.summary.cuts(content_frame_time.h,CUT=192)
-(content_frame_time.gt.192 <- content_frame_time.gt.192[, label := "content_frame_time_192"][,])
-
+content_frame_time.h <- histogram.aggregate.all("content_frame_time", table = ds_283_tablename_tmp)
+content_frame_time.gt.192 <- histogram.summary.cuts(content_frame_time.h, CUT = 192)
+(content_frame_time.gt.192 <- content_frame_time.gt.192[, label := "content_frame_time_192"][, ])
 ```
 
 
@@ -324,7 +344,7 @@ allstuff <- rbindlist(
         ncrash.content.cmp,
         ncrash.main.cmp,
         ncrash.shutdown.cmp,
-#        ncrash.oom.cmp,
+        #        ncrash.oom.cmp,
         ncrash.gpu.cmp,
         device.reset.cmp,
         ncrash_all.inci.cmp,
@@ -343,8 +363,8 @@ allstuff <- rbindlist(
         content_frame_time.gt.192
     )
 )
-allstuff <- cbind(date_computed = Sys.Date(),allstuff)
-allstuff[, .N, by=buildid]
+allstuff <- cbind(date_computed = Sys.Date(), allstuff)
+allstuff[, .N, by = buildid]
 ```
 
 
@@ -355,15 +375,14 @@ allstuff[, .N, by=buildid]
 
 min_buildid <- min(allstuff$buildid)
 g$q("delete from {ds_283_tablename} where buildid>='{min_buildid}'")
-##system(glue("bq query --format=prettyjson --nouse_legacy_sql 'delete from {ds_283_tablename} where buildid>=\'{min_buildid}\'' "))
+## system(glue("bq query --format=prettyjson --nouse_legacy_sql 'delete from {ds_283_tablename} where buildid>=\'{min_buildid}\'' "))
 atemp <- tempfile()
-fwrite(allstuff, file=atemp,row.names=FALSE,quote=TRUE,na=0)
-l <- glue("bq load --noreplace   --project_id='{env_vars[[\'project\']]}'  --source_format=CSV --skip_leading_rows=1 --null_marker=NA",
-          " \"{toShellFromSQLName(ds_283_tablename)}\" {atemp} ./dashboard_table.json")
+fwrite(allstuff, file = atemp, row.names = FALSE, quote = TRUE, na = 0)
+l <- glue(
+    "bq load --noreplace   --project_id='{env_vars[[\'project\']]}'  --source_format=CSV --skip_leading_rows=1 --null_marker=NA",
+    " \"{toShellFromSQLName(ds_283_tablename)}\" {atemp} ./dashboard_table.json"
+)
 loginfo(l)
 system(l)
 loginfo("Uploaded Dashboard Table")
-
-        
-        
 ```
