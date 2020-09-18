@@ -19,6 +19,10 @@ experiment.start <- as.Date("2020-04-01")
 slug <- "bug-1622934-pref-webrender-continued-v2-nightly-only-nightly-76-80"
 SEVEN <- 10
 
+# https://github.com/mozilla/webrender_intel_win10_nightly/issues/9
+# https://github.com/r-dbi/bigrquery/issues/395
+options(scipen=20)
+
 Emean <- function(x) exp(mean(log(1+x)))-1
 
 if(!exists("query.R")){
