@@ -224,7 +224,7 @@ ncrash.shutdown.cmp <- compare.usage[
 
 ## notably this has no upper bound
 ncrash.gpu.cmp <- compare.usage[
-    ncrash_gpu / (1 / 3600 + total_hours) < quantile(ncrash_gpu / (1 / 3600 + total_hours), 1),
+    ncrash_gpu / (1 / 3600 + total_hours) <= quantile(ncrash_gpu / (1 / 3600 + total_hours), 1),
     mAndCi(.SD[, list(id, branch, x = 1000 * ncrash_gpu / (1 / 3600 + total_hours))], "x", REPLICATES, oper = Mean),
     by = buildid
 ][, label := "ncrash_gpu_perkhr"][order(buildid, what), ]
