@@ -276,7 +276,7 @@ group by  1,2,3,4
         AND environment.system.os.name ='Windows_NT'
         AND STARTS_WITH(environment.system.os.version,'10') = TRUE
         AND environment.system.gfx.adapters[OFFSET(0)].vendor_id = '0x8086'
-        AND substr(metadata.uri.app_version,1,2)>='76' and substr(metadata.uri.app_version,1,2)<='80'
+        AND substr(metadata.uri.app_version,1,2)>='76' and substr(metadata.uri.app_version,1,2)<='89'
         AND substr(application.build_id,1,8)>='20200401'
     GROUP BY 1,2
 ),
