@@ -16,6 +16,7 @@ if [[ -z "${RUNFAST}" ]]; then
     ## Complete run if RUNFAST environment is missing
     echo "Running SLOW"
     Rscript /webrender_intel_win10_nightly/runner.R
+    cp index.html /tmp/output/
     gsutil -m  rsync -r -d /tmp/output/   $BUCKET/sguha/ds_283/
     gsutil cp /webrender_intel_win10_nightly/driver.html   $BUCKET/sguha/ds_283/
 else
