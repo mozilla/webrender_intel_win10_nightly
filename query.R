@@ -152,17 +152,17 @@ myclients AS (
         payload.processes.parent.scalars.browser_engagement_active_ticks                    AS active_ticks,
         payload.info.subsession_length                                                      AS subsession_length,
         payload.processes.parent.scalars.browser_engagement_total_uri_count                 AS total_uri,
-        mozfun.hist.extract(payload.processes.gpu.histograms.content_frame_time_vsync).values  AS content_frame_time_vsync,
-        mozfun.hist.extract(payload.histograms.fx_tab_switch_composite_e10s_ms).values         AS tab_switch_ms,
-        mozfun.hist.extract(payload.histograms.fx_page_load_ms_2).values                       AS page_load_ms,
-        mozfun.hist.extract(payload.processes.gpu.histograms.content_full_paint_time).values   AS content_full_paint_time,
-        mozfun.hist.extract(payload.processes.content.histograms.content_paint_time).values    AS content_paint_time,
-        mozfun.hist.extract(payload.processes.gpu.histograms.composite_time).values            AS composite_time,
-        mozfun.hist.extract(payload.processes.gpu.histograms.content_frame_time).values        AS content_frame_time,
-        mozfun.hist.extract(payload.processes.gpu.histograms.checkerboard_severity).values     AS checkerboard_severity,
-        mozfun.hist.extract(payload.processes.content.histograms.device_reset_reason).values   AS device_reset_reason_content,
-        mozfun.hist.extract(payload.histograms.device_reset_reason).values                     AS device_reset_reason_parent,
-        mozfun.hist.extract(payload.processes.gpu.histograms.device_reset_reason).values       AS device_reset_reason_gpu
+        JSON_EXTRACT(mozfun.hist.string_to_json(payload.processes.gpu.histograms.content_frame_time_vsync), '$.values') AS content_frame_time_vsync,
+        JSON_EXTRACT(mozfun.hist.string_to_json(payload.histograms.fx_tab_switch_composite_e10s_ms), '$.values')        AS tab_switch_ms,
+        JSON_EXTRACT(mozfun.hist.string_to_json(payload.histograms.fx_page_load_ms_2), '$.values')                      AS page_load_ms,
+        JSON_EXTRACT(mozfun.hist.string_to_json(payload.processes.gpu.histograms.content_full_paint_time), '$.values')  AS content_full_paint_time,
+        JSON_EXTRACT(mozfun.hist.string_to_json(payload.processes.content.histograms.content_paint_time), '$.values')   AS content_paint_time,
+        JSON_EXTRACT(mozfun.hist.string_to_json(payload.processes.gpu.histograms.composite_time), '$.values')           AS composite_time,
+        JSON_EXTRACT(mozfun.hist.string_to_json(payload.processes.gpu.histograms.content_frame_time), '$.values')       AS content_frame_time,
+        JSON_EXTRACT(mozfun.hist.string_to_json(payload.processes.gpu.histograms.checkerboard_severity), '$.values')    AS checkerboard_severity,
+        JSON_EXTRACT(mozfun.hist.string_to_json(payload.processes.content.histograms.device_reset_reason), '$.values')  AS device_reset_reason_content,
+        JSON_EXTRACT(mozfun.hist.string_to_json(payload.histograms.device_reset_reason), '$.values')                    AS device_reset_reason_parent,
+        JSON_EXTRACT(mozfun.hist.string_to_json(payload.processes.gpu.histograms.device_reset_reason), '$.values')      AS device_reset_reason_gpu
     FROM
         `moz-fx-data-shared-prod`.telemetry.main
     WHERE
