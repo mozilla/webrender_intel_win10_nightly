@@ -1,5 +1,7 @@
 # Dashboard
 
+NOTICE: This dashboard has been decomissioned as per [bug 1701054](https://bugzilla.mozilla.org/show_bug.cgi?id=1701054).
+
 The published dashboard lives at https://metrics.mozilla.com/public/sguha/ds-283/dashboard.html.
 
 The CI on this repo publishes a Docker container to GCR on commits to master.
